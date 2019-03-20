@@ -44,11 +44,6 @@ else:
     logHandler.setFormatter(formatter)
     logger.addHandler(logHandler)
 
-if not aws_access_key_id:
-    logging.error(
-        "ERROR: no environment variable 'AWS_ACCESS_KEY_ID' defined!")
-    sys.exit(1)
-
 if not aws_secret_access_key:
     logging.error(
         "ERROR: no environment variable 'AWS_SECRET_ACCESS_KEY' defined!")
@@ -64,9 +59,8 @@ def latest_snapshot_by_identifier(db_identifier):
                               aws_secret_access_key=aws_secret_access_key, region_name=region_name)
     snapshot_list = []
     try:
-        snapshots = rds_client.describe_db_snapshots()
+        snapshots = rds_client.describe_db_snapshots(DBInstanceIdentifier=db_identifier)
         for i in snapshots['DBSnapshots']:
-            if i['DBInstanceIdentifier'] == db_identifier:
                 pattern = re.compile(r'rds:' + db_identifier +
                             r'\-\d{4}\-\d{2}\-\d{2}\-\d{2}\-\d{2}')
                 result = re.match(
